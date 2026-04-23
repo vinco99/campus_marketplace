@@ -1,9 +1,21 @@
 from rest_framework import serializers
+from .models import User
 
-class SendOTPSerializer(serializers.Serializer):
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'role']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+
+"""class SendOTPSerializer(serializers.Serializer):
     phone = serializers.CharField()
 
 
 class VerifyOTPSerializer(serializers.Serializer):
     phone = serializers.CharField()
-    code = serializers.CharField()
+    code = serializers.CharField()"""

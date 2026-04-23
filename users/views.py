@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from rest_framework import generics
+from .serializers import RegisterSerializer
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -7,7 +10,12 @@ from .models import OTP
 from .utils import generate_otp, send_otp
 
 # Create your views here.
-class SendOTPView(APIView):
+class RegisterView(generics.CreateAPIView):
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+
+"""class SendOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone')
 
@@ -39,4 +47,4 @@ class VerifyOTPView(APIView):
         user.is_phone_verified = True
         user.save()
 
-        return Response({"message": "Phone verified successfully"})
+        return Response({"message": "Phone verified successfully"})"""
