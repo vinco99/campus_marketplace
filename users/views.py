@@ -4,7 +4,7 @@ from .serializers import RegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomLoginSerializer
-#from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -15,7 +15,7 @@ from .utils import generate_otp, send_otp
 # Create your views here.
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
- #   permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
@@ -29,6 +29,7 @@ class CustomLoginView(TokenObtainPairView):
 
 
 class SendOTPView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         phone = request.data.get('phone')
 
@@ -42,6 +43,7 @@ class SendOTPView(APIView):
 
 
 class VerifyOTPView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         phone = request.data.get('phone')
         code = request.data.get('code')
@@ -59,6 +61,7 @@ class VerifyOTPView(APIView):
 
         user = User.objects.get(phone=phone)
         user.is_phone_verified = True
+        user.is_authenticated = True
         user.save()
 
         #Generate JWT Tokens
