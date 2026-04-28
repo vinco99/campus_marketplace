@@ -9,11 +9,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    status = serializers.CharField(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'delivery_type', 'items']
+        fields = ['id', 'total_price', 'status']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
