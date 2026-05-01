@@ -61,7 +61,6 @@ class VerifyOTPView(APIView):
 
         user = User.objects.get(phone=phone)
         user.is_phone_verified = True
-        user.is_authenticated = True
         user.save()
 
         #Generate JWT Tokens

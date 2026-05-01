@@ -1,12 +1,14 @@
 import requests
+import uuid
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
-from .models import Order, Payment
 from .serializers import OrderSerializer
-from rest_framework.permissions import IsAuthenticated
-import uuid
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .models import Order, Payment
+from wallet.models import Wallet, Transaction
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
@@ -60,8 +62,9 @@ class InitializePaymentView(APIView):
 
 
 class VerifyPaymentView(APIView):
-    def get(self, request):
-        reference = request.GET.get('reference')
+    permission_classes = [AllowAny]
+    
+    def get(self, request, reference):
 
         url = f"https://api.paystack.co/transaction/verify/{reference}"
         headers = {
@@ -88,3 +91,38 @@ class VerifyPaymentView(APIView):
         order.save()
 
         return Response({"message": "Payment verified successfully"})
+
+
+class ConfirmDeliveryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, order_id):
+        user = request.user
+
+        try:
+            order = Order.objects.get(id=order_id, buyer=user)
+        except Order.DoesNotExist:
+            return Response({"error": "Order not found"}, status=404)
+
+        if order.status != 'delivered':
+            return Response({"error": "Order not delivered yet"}, status=400)
+
+        if not order.is_paid:
+            return Response({"error": "Order not paid"}, status=400)
+
+        # CREDIT SELLER WALLET
+        wallet = Wallet.objects.get(user=order.seller)
+        wallet.balance += order.total_price
+        wallet.save()
+
+        Transaction.objects.create(
+            wallet=wallet,
+            amount=order.total_price,
+            type='credit',
+            reference=f"order_{order.id}"
+        )
+
+        order.status = 'completed'
+        order.save()
+
+        return Response({"message": "Order completed & seller credited"})
