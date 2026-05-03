@@ -30,6 +30,10 @@ class InitializePaymentView(APIView):
             order = Order.objects.get(id=order_id, buyer=user)
         except Order.DoesNotExist:
             return Response({"error": "Order not found"}, status=404)
+        
+        if hasattr(order, 'payment') and order.payment.verified:
+            return Response({"error": "Order already paid"})
+        
 
         reference = str(uuid.uuid4())
 
@@ -81,7 +85,16 @@ class VerifyPaymentView(APIView):
             payment = Payment.objects.get(reference=reference)
         except Payment.DoesNotExist:
             return Response({"error": "Payment not found"}, status=404)
+        
 
+        # LOOK INTO THIS !
+        if payment.amount != order.total_price:
+            return Response({"error": "Amount mismatch"}, status=400)
+
+
+
+        payment.gateway_response = str(res_data)
+        payment.status = res_data['data']['status']
         payment.verified = True
         payment.save()
 
