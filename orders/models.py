@@ -20,6 +20,16 @@ class Order(models.Model):
 
     buyer = models.ForeignKey(User, related_name='buyer_orders', on_delete=models.CASCADE)
     seller = models.ForeignKey(User, related_name='seller_orders', on_delete=models.CASCADE)
+    dispatch = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='deliveries'
+    )
+
+    is_delivered = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
 
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
