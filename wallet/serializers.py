@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Wallet, Transaction
+from .models import Wallet, Transaction, Withdrawal
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
