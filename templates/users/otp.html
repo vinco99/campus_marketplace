@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Verify OTP</h2>
+
+<form method="POST" class="bg-white p-6 shadow rounded">
+    {% csrf_token %}
+
+    <input type="text" name="otp" placeholder="Enter OTP" class="input"><br><br>
+
+    <button class="bg-purple-500 text-white px-4 py-2 rounded">
+        Verify
+    </button>
+</form>
+{% endblock %}
