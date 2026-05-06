@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'orders',
     'wallet',
     'delivery',
+    'channels',
     'chat'
 ]
 
@@ -96,6 +97,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'campus_xchange.wsgi.application'
+
+ASGI_APPLICATION = 'campus_xchange.asgi.application'
 
 
 # Database
