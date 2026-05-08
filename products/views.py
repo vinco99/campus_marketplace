@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Product
 from .serializers import ProductSerializer
@@ -14,3 +15,4 @@ class ProductViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Only sellers can create products")
 
         serializer.save(seller=self.request.user)
+
